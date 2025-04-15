@@ -1,0 +1,3 @@
+Namespace,Pod Name,Status,Node
+kube-system,metrics-server-5b9b975d87-gvtq4,Pending,i-01aa9a672f25b5e17
+kube-system,metrics-server-5b9b975d87-m4mcf,Pending,i-0bfab27aedadfa248
