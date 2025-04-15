@@ -1,3 +1,5 @@
+# Python script to monitor Kubernetes cluster
+- This python script should be run from the machine that has access to the kubernetes cluster, The python script uses kubernetes module which looks for .kubeconfig in its default location .kube/config
 - Create a python file
 - Create virtual environment to install dependencies
 ```bash
