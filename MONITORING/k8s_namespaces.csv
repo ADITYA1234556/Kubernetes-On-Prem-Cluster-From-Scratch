@@ -1,5 +1,0 @@
-Namespace Name,Status
-default,Active
-kube-node-lease,Active
-kube-public,Active
-kube-system,Active
