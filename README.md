@@ -1,6 +1,46 @@
 # Kubernetes
 - In this repo, All major concepts of kubernetes mentioned.
 
+## Steps
+- Make sure you have passwordless conectivity to all the VMS, you can ssh-keygen copy id_rsa.pub to all the VMS .ssh/Authorized_keys
+1. Install client tools **kubectl**
+2. Provision Administrative server, 1 Administrative server per cluster which will act has Certificate Authority to issue certificates for Public Key Infrastructure.
+3. Generate certificates for,
+  1. Certificate Authority server: Who is responsible for signing all other certificates
+  2. Server certificates
+    1. Kube-apiserver
+    2. Controller Manager
+    3. Scheduler
+    4. Admin certificates: For admin user who is part of the system:masters group
+    5. ETCD certificate
+    6. he API Server Kubelet Client Certificate: This certificate is for API server to authenticate with the kubelets when it requests information from them
+    7. Service account
+  3. Client certificates
+    1. Kubelet: There are two ways to provision kubelet certificates. Manual way or TLS bootstrap. Requires creating roles.
+    2. Kubeproxy
+4. Distribute the certificates
+  1. ca.crt kube-proxy.crt kube-proxy.key to the **worker** nodes
+  2. ca.crt ca.key kube-apiserver.key kube-apiserver.crt apiserver-kubelet-client.crt apiserver-kubelet-client.key service-account.key service-account.crt etcd-server.key etcd-server.crt kube-controller-manager.key kube-controller-manager.crt kube-scheduler.key kube-scheduler.crt to the **master** nodes
+5. Generate kubernetes configuration files for authentication:
+  1. Kuber-proxy.config for Kuber-proxy
+  2. Kube-controller-manager.config for Kube-controller
+  3. Kube-scheduler.config for Kube-scheduler
+  4. admin.config = for admin user
+6. Distribute the certificates
+  1. Kuber-proxy.config to the **worker** nodes
+  2. Kube-controller-manager.config Kube-scheduler.config admin.config o the **worker** nodes
+7. Generate the Data Encryption Config and Key: This keyy will be used to encrypt data at rest in the ETCD
+8. Bootstrap ETCD server
+9. Bootstrap Master nodes
+10. Install Container Runtime Engine on worker nodes
+11. Bootstrap the worker nodes
+12. Configure the kubeconfig file that the kubectl utility will use for communication to api server.
+13. Install pod networking
+14. Create a ClusterRole to grant apiGroups to perform all operations on the resources namely {proxy, stats, log, spec, metrics} 
+15. Install DNS solution for internal cluster communication
+16. Smoke test the cluster
+17. End-To-End tests inside the cluster.
+
 ## Troubleshooting.
 ## ISSUE 1:
 - After bootstrapping my cluster with all the services, My kuberenets cluster was failing.
@@ -74,4 +114,19 @@ NAME                 STATUS    MESSAGE   ERROR
 controller-manager   Healthy   ok
 etcd-0               Healthy   ok
 scheduler            Healthy   ok
+```
+
+## Issue 3: Namespace stuck termincating
+1. Force deleting a namespace
+```bash
+kubectl get namespace istio-system -o json > istio-ns.json
+vi istio-ns.json 
+#    "spec": {
+#        "finalizers": [
+#            "kubernetes"
+#        ]
+#    },
+#  ==> "spec": {} 
+kubectl proxy --port=8001 # to open a proxy to talk to the API server.
+curl -k -H "Content-Type: application/json" -X PUT --data-binary @istio-ns.json http://127.0.0.1:8001/api/v1/namespaces/istio-system/finalize
 ```

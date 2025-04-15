@@ -11,7 +11,12 @@ Each kubeconfig requires a Kubernetes API Server to connect to. To support high 
 [//]: # (host:controlplane01)
 
 On `controlplane01`
-
+```bash
+scp ca.crt admin.crt admin.key controlplane02:/home/vagrant/
+scp ca.crt admin.crt admin.key node01:/home/vagrant/
+scp ca.crt admin.crt admin.key node02:/home/vagrant/
+```
+Run the below commands on all both master nodes and worker nodes to get kubeconfig file to talk to api server. 
 Get the kube-api server load-balancer IP.
 
 ```bash
